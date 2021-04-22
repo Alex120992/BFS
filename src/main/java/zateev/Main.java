@@ -7,10 +7,11 @@ public class Main {
         long s = System.currentTimeMillis();
         FindOnWidth findOnWidth = new FindOnWidth();
 
-        findOnWidth.findRoute(massive.createMass(10000,3000));
+        findOnWidth.findRoute(massive.createMass(10000,1000));
 
         System.out.println((System.currentTimeMillis()-s));
         System.out.println(Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory());
     }
+
 
 }

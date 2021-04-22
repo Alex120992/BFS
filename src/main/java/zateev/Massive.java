@@ -8,31 +8,18 @@ public class Massive {
         int[][] ch = new int[n][m];
         int count = 0;
         for (int i = 0; i < n; i++) {
+
             for (int j = 0; j < m; j++) {
-                if (i == (n + m) / 2 && (j == 0 || j > 1)) chars[i][j] = '#';
+                if ((j == m/2) && j==1 ) { chars[i][j]='#';
+                }
                 else {
                     chars[i][j] = '.';
-                    chars[0][0] = 'S';
+                    chars[0][0] = '@';
                     chars[n - 1][m - 1] = 'X';
                 }
-
             }
-
         }
-        for (int i = 0; i < n; i++) {
-            for (int j = 0; j < m; j++) {
-                if (i == (n + m) / 2 && (j == 0 || j == 2)) {
-                    ch[i][j] = -1;
 
-                } else {
-                    ch[i][j] = count;
-
-
-                }
-                count++;
-            }
-
-        }
         return chars;
     }
 

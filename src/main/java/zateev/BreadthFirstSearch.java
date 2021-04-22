@@ -12,7 +12,9 @@ public class BreadthFirstSearch {
     public BreadthFirstSearch(int V, int startPoint, int[][] edges) {
         marked = new boolean[V];
         edgeTo = new int[V];
+        this.start = startPoint;
         bfs(edges, startPoint);
+        edges=null;
     }
 
     private void bfs(int[][] edges, int start) {
@@ -20,12 +22,10 @@ public class BreadthFirstSearch {
         marked[start] = true;
         queue.addFirst(start);
         while (!queue.isEmpty()) {
-
             int v = queue.getLast();
             queue.removeLast();
             for (int i = 0; i < edges[v][4]; i++) {
                 int w = edges[v][i];
-
                 if (!marked[w]) {
                     edgeTo[w] = v;
                     marked[w] = true;
@@ -33,16 +33,17 @@ public class BreadthFirstSearch {
                 }
             }
         }
+
     }
 
     public Stack<Integer> pathTo(int endPoint) {
         if (!hasPathTo(endPoint)) return null;
         Stack<Integer> stack = new Stack<>();
         for (int x = endPoint; x != start; x = edgeTo[x]) {
-            stack.push(x);
+            stack.add(x);
         }
-        stack.push(start);
-
+        stack.add(start);
+        edgeTo=null;
         return stack;
     }
 

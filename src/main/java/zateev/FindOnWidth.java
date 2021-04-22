@@ -2,38 +2,40 @@ package zateev;
 
 public class FindOnWidth implements RouteFinder {
     private int[][] edges;
-    //    private Stack<Integer>[] edges;
+    BreadthFirstSearch breadthFirstSearch;
     int startPoint;
     int endPoint;
+    int cols;
+    int rows;
+    int a;
 
     @Override
     public char[][] findRoute(char[][] map) {
+        long s = System.currentTimeMillis();
+        cols = map[0].length;
+        rows = map.length;
         createGraphEdges(map);
-
-        BreadthFirstSearch breadthFirstSearch = new BreadthFirstSearch(map.length * map[0].length, startPoint, edges);
-        System.out.println(breadthFirstSearch.hasPathTo(endPoint));
+        breadthFirstSearch = new BreadthFirstSearch(rows * cols, startPoint, edges);
+        edges = null;
         breadthFirstSearch.pathTo(endPoint);
-        return new char[0][];
+        System.out.println(breadthFirstSearch.hasPathTo(endPoint));
+        System.out.println(System.currentTimeMillis()-s);
+        return null;
     }
 
     public void createGraphEdges(char[][] masValues) {
         edges = new int[masValues.length * masValues[0].length][5];
-        for (int i = 0; i < masValues.length; i++) {
-            for (int j = 0; j < masValues[0].length; j++) {
-
-                if (masValues[i][j] == 'S') startPoint = i * masValues[0].length + j; // сохоаняем начальную точку
-                else if (masValues[i][j] == 'X') endPoint = i * masValues[0].length + j; // сохраняем конечную точку
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < cols; j++) {
+                if (masValues[i][j] == '@') startPoint = i * cols + j; // сохоаняем начальную точку
+                else if (masValues[i][j] == 'X') endPoint = i * cols + j; // сохраняем конечную точку
                 else if (masValues[i][j] == '#') continue; // если стена то продолжаем цикл
 
-                if (j + 1 < masValues[0].length && masValues[i][j + 1] != '#') { //вправо
-
-                    addEdge(i * masValues[0].length + j, ((i * masValues[0].length + j) + 1));
-
+                if (j + 1 < cols && masValues[i][j + 1] != '#') { //вправо
+                    addEdge(i * cols + j, ((i * cols + j) + 1));
                 }
-                if (i + 1 < masValues.length && masValues[i + 1][j] != '#') { // вниз
-
-                    addEdge(i * masValues[0].length + j, (((i + 1) * masValues[0].length) + j));
-
+                if (i + 1 < rows && masValues[i + 1][j] != '#') { // вниз
+                    addEdge(i * cols + j, (((i + 1) * cols) + j));
                 }
             }
         }
@@ -42,7 +44,7 @@ public class FindOnWidth implements RouteFinder {
 
     /* Добавляем ребра между вершинами в двумерный массив */
     private void addEdge(int firstVertex, int secondVertex) {
-        int a = edges[firstVertex][4];
+        a = edges[firstVertex][4];
 
         edges[firstVertex][a] = secondVertex;
         edges[firstVertex][4] = ++a;
@@ -54,13 +56,20 @@ public class FindOnWidth implements RouteFinder {
 
     }
 
-//    char[][] createmas(char[][] mas) {
-//        for (int i = 0; i < mas.length; i++) {
-//            for (int j = 0; j < mas[0].length; j++) {
+//    char[][] createmas(char[][] mas, Stack<Integer> stack) {
 //
+//        while (!stack.isEmpty()) {
+//
+//            int val = stack.pop();
+//            int i = val / cols;
+//            for (int j = 0; j < cols; j++) {
+//                if (i * mas[0].length + j == val && mas[i][j] != '@' && mas[i][j] != 'X') {
+//                    mas[i][j] = '+';
+//
+//                }
 //            }
 //        }
 //
-//
+//        return mas;
 //    }
 }
