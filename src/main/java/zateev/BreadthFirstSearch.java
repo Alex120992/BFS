@@ -3,41 +3,44 @@ package zateev;
 import java.util.ArrayDeque;
 import java.util.Stack;
 
-public class BreadthFirstSearch {
+public class BreadthFirstSearch implements Runnable {
     private final boolean[] marked;
     private int[] edgeTo;
     private final int start;
 
     /**
-     * @param V - количество вершин
+     * @param V          - количество вершин
      * @param startPoint - исходная точка
-     *
      */
     public BreadthFirstSearch(int V, int startPoint) {
         marked = new boolean[V];
         edgeTo = new int[V];
         this.start = startPoint;
-        bfs();
+
     }
 
-    private void bfs() {
-        ArrayDeque<Integer> queue = new ArrayDeque<>();
-        marked[start] = true;
-        queue.addFirst(start);
-        while (!queue.isEmpty()) {
-            int v = queue.getLast();
-            queue.removeLast();
-            for (int i = 0; i < RouterFinderImpl.edges[v][4]; i++) {
-                int w = RouterFinderImpl.edges[v][i];
-                if (!marked[w]) {
-                    edgeTo[w] = v;
-                    marked[w] = true;
-                    queue.addFirst(w);
+    private  void bfs() {
+        synchronized (RouterFinderImpl.object) {
+            ArrayDeque<Integer> queue = new ArrayDeque<>();
+            marked[start] = true;
+            queue.addFirst(start);
+            while (!queue.isEmpty()) {
+                int v = queue.getLast();
+                queue.removeLast();
+                for (int i = 0; i < RouterFinderImpl.edges[v][4]; i++) {
+                    int w = RouterFinderImpl.edges[v][i];
+                    if (!marked[w]) {
+                        edgeTo[w] = v;
+                        marked[w] = true;
+                        queue.addFirst(w);
+                    }
                 }
             }
+
+            RouterFinderImpl.edges = null;
+            System.gc();
+            RouterFinderImpl.object.notifyAll();
         }
-        RouterFinderImpl.edges = null;
-        System.gc();
     }
 
     public Stack<Integer> pathTo(int endPoint) {
@@ -49,6 +52,7 @@ public class BreadthFirstSearch {
         stack.add(start);
         edgeTo = null;
         System.gc();
+
         return stack;
     }
 
@@ -56,4 +60,11 @@ public class BreadthFirstSearch {
         return marked[endPoint];
     }
 
+    @Override
+    public void run() {
+        bfs();
+
+    }
+
 }
+

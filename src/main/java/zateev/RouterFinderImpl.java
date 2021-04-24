@@ -1,15 +1,20 @@
 package zateev;
 
 import java.util.Stack;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class RouterFinderImpl implements RouteFinder {
+    static  Object object;
+    ExecutorService executorService;
     public static int[][] edges;
     private char[][] map;
     private BreadthFirstSearch breadthFirstSearch;
-    private int startPoint;
-    private int endPoint;
+    private Integer startPoint;
+    private Integer endPoint;
     private int cols;
     private int rows;
+    private int deleteOnPart;
     private int a;
 
     /*
@@ -19,45 +24,56 @@ public class RouterFinderImpl implements RouteFinder {
 
     @Override
     public char[][] findRoute(char[][] map) {
-        cols = map[0].length;
-        rows = map.length;
-        this.map = map;
-        map = null;
-        System.gc();
-        createGraphEdges();
-        breadthFirstSearch = new BreadthFirstSearch(rows * cols, startPoint);
-        System.gc();
-        return markPath(breadthFirstSearch.pathTo(endPoint));
+        object = new Object();
+        synchronized (object) {
+            executorService = Executors.newSingleThreadExecutor();
+            cols = map[0].length;
+            rows = map.length;
+            deleteOnPart = formule();
+            this.map = map;
+            map = null;
+            createGraphEdges();
+            return markPath(breadthFirstSearch.pathTo(endPoint));
+        }
     }
 
-    public void createGraphEdges() {
+    public  void createGraphEdges() {
 
-        edges = new int[cols * rows][5];
-        for (int i = 0; i < rows; i++) {
-            for (int j = 0; j < cols; j++) {
-                if (map[i][j] == '@') {
-                    startPoint = i * cols + j;
-                    // сохраняем начальную точку
-                } else if (map[i][j] == 'X') {
-                    endPoint = i * cols + j;
-                    // сохраняем конечную точку
-                } else if (map[i][j] == '#') {
-                    continue;
-                    // если стена, то продолжаем цикл
+        synchronized (object) {
+            edges = new int[cols * rows][5];
+            for (int i = 0; i < rows; i++) {
+                for (int j = 0; j < cols; j++) {
+                    if (map[i][j] == '@') {
+                        startPoint = i * cols + j;
+                        // сохраняем начальную точку
+                    } else if (map[i][j] == 'X') {
+                        endPoint = i * cols + j;
+                        // сохраняем конечную точку
+                    } else if (map[i][j] == '#') {
+                        continue;
+                        // если стена, то продолжаем цикл
+                    }
+                    if (j + 1 < cols && map[i][j + 1] != '#') {
+                        addEdge(i * cols + j, ((i * cols + j) + 1));
+                        //вправо
+                    }
+                    if (i + 1 < rows && map[i + 1][j] != '#') {
+                        addEdge(i * cols + j, (((i + 1) * cols) + j));
+                        // вниз
+                    }
                 }
-                if (j + 1 < cols && map[i][j + 1] != '#') {
-                    addEdge(i * cols + j, ((i * cols + j) + 1));
-                    //вправо
-                }
-                if (i + 1 < rows && map[i + 1][j] != '#') {
-                    addEdge(i * cols + j, (((i + 1) * cols) + j));
-                    // вниз
-                }
+//                if (deleteOnPart>0 && i==deleteOnPart)
             }
-        }
-
+            breadthFirstSearch = new BreadthFirstSearch(rows * cols, startPoint);
+            executorService.execute(breadthFirstSearch);
         System.gc();
-
+            try {
+                object.wait();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            executorService.shutdown();
+        }
     }
 
     /*
@@ -92,4 +108,12 @@ public class RouterFinderImpl implements RouteFinder {
         }
         return map;
     }
+    private int formule (){
+        int size = cols*rows*20; // количество байт
+        int r;
+        if (size > 1000000) return size/1000000;
+        else return 0;
+
+    }
+
 }

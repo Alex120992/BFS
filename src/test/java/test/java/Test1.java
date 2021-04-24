@@ -22,9 +22,9 @@ public class Test1 {
     }
 
     @Test
-    @BenchmarkOptions(concurrency = 1, warmupRounds = 0, benchmarkRounds = 1)
+    @BenchmarkOptions(concurrency = 1, warmupRounds = 0, benchmarkRounds = 10)
     public void time1() {
-        routeFinder.findRoute(massive.createMass2(2000,1000));
+        routeFinder.findRoute(massive.createMass2(10000,1000));
     }
 
     @After

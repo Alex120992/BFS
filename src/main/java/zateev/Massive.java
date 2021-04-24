@@ -11,16 +11,16 @@ public class Massive {
 
             for (int j = 0; j < m; j++) {
                 if ((i == 0 || i>1 ) && j==2 ) { chars[i][j]='#';
-//                    System.out.print(chars[i][j]+"\t");
+                    System.out.print(chars[i][j]+"\t");
                 }
                 else {
                     chars[i][j] = '.';
                     chars[0][0] = 'X';
                     chars[n-1][m-1] = '@';
-//                    System.out.print(chars[i][j]+"\t");
+                    System.out.print(chars[i][j]+"\t");
                 }
             }
-//            System.out.println();
+            System.out.println();
         }
 
         return chars;
