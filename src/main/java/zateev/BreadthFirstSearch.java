@@ -1,31 +1,34 @@
 package zateev;
 
-import java.util.LinkedList;
+import java.util.ArrayDeque;
 import java.util.Stack;
 
 public class BreadthFirstSearch {
-    private boolean[] marked;
+    private final boolean[] marked;
     private int[] edgeTo;
-    private int start;
+    private final int start;
 
-
-    public BreadthFirstSearch(int V, int startPoint, int[][] edges) {
+    /**
+     * @param V - количество вершин
+     * @param startPoint - исходная точка
+     *
+     */
+    public BreadthFirstSearch(int V, int startPoint) {
         marked = new boolean[V];
         edgeTo = new int[V];
         this.start = startPoint;
-        bfs(edges, startPoint);
-        edges=null;
+        bfs();
     }
 
-    private void bfs(int[][] edges, int start) {
-        LinkedList<Integer> queue = new LinkedList<>();
+    private void bfs() {
+        ArrayDeque<Integer> queue = new ArrayDeque<>();
         marked[start] = true;
         queue.addFirst(start);
         while (!queue.isEmpty()) {
             int v = queue.getLast();
             queue.removeLast();
-            for (int i = 0; i < edges[v][4]; i++) {
-                int w = edges[v][i];
+            for (int i = 0; i < RouterFinderImpl.edges[v][4]; i++) {
+                int w = RouterFinderImpl.edges[v][i];
                 if (!marked[w]) {
                     edgeTo[w] = v;
                     marked[w] = true;
@@ -33,7 +36,8 @@ public class BreadthFirstSearch {
                 }
             }
         }
-
+        RouterFinderImpl.edges = null;
+        System.gc();
     }
 
     public Stack<Integer> pathTo(int endPoint) {
@@ -43,7 +47,8 @@ public class BreadthFirstSearch {
             stack.add(x);
         }
         stack.add(start);
-        edgeTo=null;
+        edgeTo = null;
+        System.gc();
         return stack;
     }
 
